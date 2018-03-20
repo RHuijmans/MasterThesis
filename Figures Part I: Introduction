@@ -1,0 +1,193 @@
+% Script 1: Data gathering Sea water levels
+% Location: 'Noordersluis IJmuiden West'
+% Data retreived from database Rijkswaterstaat
+% ---------------------------
+%       Initialisation
+% ---------------------------
+close all
+clear 
+
+data = load('data_waterlevelsNS.txt')       % Measurements water levels North Sea level '1-Jan-2010 - 31-December-2013'(cm)
+datat = load('data_tidalconstituents_IJmuiden.txt')     % Data tidal considuents location IJmuiden
+
+t = datetime('01-Jan-2010 00:00:00'):minutes(10):datetime('31-Dec-2013 23:50:00')
+
+date_ref = '1-Jan-2017 00:00:00'
+
+%% Input tide
+date_begin_tide = '1-Jan-2010 00:00:00'
+date_end_tide = '2-Jan-2010 23:50:00'
+
+timestep_size = 0.1        % Time step size [hours]
+
+% Input Sea level characteristics
+MSL = mean(data)            % Mean Sea level t.o.v. NAP [cm]
+SLR_year = [0.1 0.6]               % Yearly sea level rise [cm]
+
+% Input pump characteristics
+minhead_Stork = 20          % Minimum head Stork-pump [cm]
+maxhead_Stork = 252         % Maximum head Stork-pump [cm]
+
+%% ---------------------------
+%       Perform tidal analysis
+% ----------------------------
+
+N = (datenum(date_end_tide) - datenum(date_begin_tide))*24         % Number of hours
+nbins = (N/timestep_size)+1 % Number of timesteps
+t_t = 0:timestep_size:N
+
+ang_velocity = datat(:,1)   % Angular velocity [degr. per hour]
+amp = datat(:,2)    % Amplitude of the tidal considuents [cm]
+phase = datat(:,3)  % Phase of the tidal considuents [degr]
+t_tide1 = datetime(date_begin_tide)
+t_tide2 = datetime(date_end_tide)
+t_tide = t_tide1:hours(1).*timestep_size:t_tide2
+
+for i = 1:31
+    eta = amp(i,1).*cosd(ang_velocity(i,1).*(t_t) + phase(i,1));
+    eta_n(i,:) = [eta]
+end 
+eta_t = sum(eta_n,1)    % Water elevations Tidal wave IJmuiden
+
+for h = [1 2]
+SL = MSL + SLR_year(1,h)/24/365*timestep_size*t_t ;  % Mean Sea Level t.o.v. NAP
+
+eta_MSL_t = eta_t+SL    % Tidal water level elevations + Sea level rise
+
+%% ---------------------------
+%       Discharges and on/off mode pump
+% ----------------------------
+head = eta_MSL_t + 40
+on_off = eta_MSL_t + 40
+on_off(on_off < minhead_Stork)= 0
+on_off(on_off  > maxhead_Stork)= 0
+on_off(on_off > 0 )= 1
+
+Q_Stork = on_off.*(-0.0643*head + 46.769);
+
+t_percentages = [datetime(date_begin_tide):hours(1)*timestep_size:datetime(date_end_tide)]
+yearnumbers = year(t_percentages)
+on_off_t = [yearnumbers;on_off]
+unique_yearnumbers = unique(yearnumbers)
+for y = 1:length(unique_yearnumbers)
+B = on_off_t(:,(on_off_t(1,:)==unique_yearnumbers(1,y)))
+percentage_on = sum(B(2,:) == 1)/size(B,2)*100
+percentage_off = sum(B(2,:) == 0)/size(B,2)*100
+percentage_on_n(1,y) = [percentage_on]
+percentage_off_n(1,y) = [percentage_off]
+end 
+percentage_on_n_SL (h,:) =  [percentage_on_n]
+end 
+
+percentages_on_off_per_year = transpose([percentage_on_n; percentage_off_n])
+
+%% ---------------------------
+%       Plots
+% ----------------------------
+TUblue = [0 166 214]./255
+lightgrey = [214 214 214]./255
+
+
+
+figure(1)               % Time series
+plot(t,data)
+title ('Time series data')
+xlabel('Date')
+ylabel('Water level (cm)')
+hold on
+xL = xlim();
+x1 = plot(xL,[-40 -40],'r')
+hold on
+xL = xlim();
+x2 = plot(xL,[170 170],'g')
+hold on
+xL = xlim();
+x3 = plot(xL,[340 340],'b')
+hold off
+legend([x1 x2 x3], 'NSC water level', 'Stork pump limit', 'Nijhuis pump limit')
+
+figure (2)              % Emperical PDF and CDF
+subplot (1,2,1)
+histogram(data,'Normalization','pdf')
+title ('Emperical PDF North Sea water levels')
+xlabel('Water level (cm)')
+ylabel('P(H = h)')
+hold on
+yL1 = get(gca,'YLim');
+y1 = line([-40 -40],yL1,'Color','r');
+legend ( 'NSC water level' )
+hold on
+yL2 = get(gca,'YLim');
+y2 = line([170 170],yL2,'Color','g');
+hold on
+yL3 = get(gca,'YLim');
+y3 = line([340 340],yL3,'Color','b');
+hold off
+
+subplot (1,2,2)
+histogram(data,'Normalization','cdf')
+title ('Emperical CDF North Sea water levels')
+xlabel('Water level (cm)')
+ylabel('P(H < h)')
+hold on
+yL1 = get(gca,'YLim');
+line([-40 -40],yL1,'Color','r');
+hold on
+yL2 = get(gca,'YLim');
+line([170 170],yL2,'Color','g');
+hold on
+yL3 = get(gca,'YLim');
+line([340 340],yL3,'Color','b');
+hold off
+legend([y1 y2 y3], 'NSC water level', 'Stork pump limit', 'Nijhuis pump limit', 'Location','southoutside','Orientation','horizontal')
+
+figure(3)                   % Plot tidal time series
+plot(t_tide,eta_MSL_t,'Color',TUblue,'Linewidth',3)
+xlabel('Time (h)')
+ylabel('North Sea water level (cm)')
+hold on
+xL = xlim();
+x1 = plot(xL,[-40 -40],'r')
+hold off
+legend('Tidal time series', 'NSC water level')
+
+figure (4)                  % Emperical PDF vs tidal PDF
+subplot(1,2,1)
+histogram(data,'Normalization','pdf')
+hold on
+histogram(eta_MSL_t,'Normalization','pdf')
+hold off
+xlabel('Water level (cm)')
+ylabel('P(H = h)')
+legend('Emperical data pdf','Tidal generation pdf')
+
+subplot(1,2,2)
+[f1,x] = ecdf(data)
+plot(x,f1,'Linewidth',2)
+xlabel('Water level (cm)')
+ylabel('P(H < h)')
+hold on
+[f2,x] = ecdf(eta_MSL_t)
+plot(x,f2,'Linewidth',2)
+hold off
+legend('Emperical data pdf','Tidal generation pdf')
+
+figure (6)
+plot(t_t, Q_Stork);
+xlabel('time(hours)')
+ylabel('Q_Stork')
+
+figure (7)
+plot(Q_Stork, head);
+xlabel('Q_S (m^3/s)')
+ylabel('Head (m)')
+
+figure (8)
+fill([unique_yearnumbers,fliplr(unique_yearnumbers)],[percentage_on_n_SL(1,:), fliplr(percentage_on_n_SL(2,:))], lightgrey)
+xlabel('Year')
+ylabel('Percentage (%)')
+hold on
+plot(unique_yearnumbers, percentage_on_n_SL(1,:), 'Linewidth', 3, 'Color', TUblue)
+hold on
+plot(unique_yearnumbers, percentage_on_n_SL(2,:),'Linewidth', 3, 'Color', TUblue)
+hold off
