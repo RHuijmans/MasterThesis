@@ -1,0 +1,20 @@
+function [Probability_of_Non_Availability] = Markov_Chain_Dependent(MTTF_component,MTTR,end_of_time_series)
+% Markov chain process
+
+% INPUT
+% Means of NPBN per year
+% Transition Probability Matrix (TPM)
+
+% Transition probabilities
+p11 = 1-(1./MTTF_component); p12 = 1./MTTF_component; 
+p21 = 1/MTTR; p22 = 1-(1/MTTR);
+
+tn = [1 0];
+for year = 2:1:end_of_time_series+1
+    TPM_year = [p11(year-1,:) p12(year-1,:);p21 p22];
+    tn(year,:) = tn(year-1,:)*TPM_year;  %#ok<*AGROW>
+end
+Probability_of_Non_Availability = tn(:,2);
+Probability_of_Non_Availability(1,:) = [];
+
+
