@@ -1,0 +1,273 @@
+% Copula Validation
+
+% Model validation, based on Joe (2014). Via semi-correlations we are able
+% to determine the upper- and lower quadrants of the normal ransforms of 
+% the original values.
+clear
+close all
+
+Import_data = importdata('INPUT_BN.csv');
+CopulasInNPBN = importdata('CopulasInNPBN.csv');
+CopulasInWholeNPBN =  CopulasInNPBN(1).data;
+data = Import_data (1).data; 
+datatext = Import_data (1).textdata;
+
+Discharge_IJmuiden = data(:,1);
+D_NSC1 = data(:,2);
+D_NSC2 = data(:,3);
+Discharge_NSC = data(:,4);
+D_ARC1 = data(:,5);
+D_ARC2 = data(:,6);
+D_ARC3 = data(:,7);
+D_ARC4 = data(:,8);
+D_ARC5 = data(:,9);
+D_ARC6 = data(:,10);
+D_ARC7 = data(:,11);
+D_ARC8 = data(:,12);
+D_ARC9 = data(:,13);
+D_ARC10 = data(:,14);
+D_ARC11 = data(:,15);
+D_ARC12 = data(:,16);
+D_ARC13 = data(:,17);
+Discharge_ARC = data(:,18);
+R_NSC = data(:,19);
+R_ARC = data(:,20);
+
+% SEMI-CORRELATIONS
+% Transformation to standard normals
+% Transformation to emperical values X and Y to Z1 and Z2
+Copulas = CopulasInWholeNPBN;
+
+for Arcnr = 1:1:length(Copulas)
+    Variable_1 = data(:,Copulas(Arcnr,1));
+    Variable_2 = data(:,Copulas(Arcnr,2));
+   
+    % Variable 1 - Transformation to standard normal 
+    [F_X1,x1] = ecdf(Variable_1);
+    Emperical_CDF_X1 = [x1 F_X1];
+    Emperical_CDF_X1(1,:) = [];
+for sample = 1:1:length(Variable_1)
+    combination1(sample,:) = Emperical_CDF_X1(Emperical_CDF_X1(:,1) == Variable_1(sample,:),:);
+    Z_1(sample,1) = norminv(combination1(sample,2));
+    Z_1(any(isinf(Z_1),2),:) = 0.999999999999;
+end
+Value_to_Standard_Normals_1 = [Variable_1 combination1(:,2) Z_1];
+
+    % Variable 2
+    [F_X2,x2] = ecdf(Variable_2);
+    Emperical_CDF_X2 = [x2 F_X2];
+    Emperical_CDF_X2(1,:) = [];
+for sample = 1:1:length(Variable_2)
+    combination2(sample,:) = Emperical_CDF_X2(Emperical_CDF_X2(:,1) == Variable_2(sample,:),:);
+    Z_2(sample,1) = norminv(combination2(sample,2));
+    Z_2(any(isinf(Z_2),2),:) = 0.999999999999;
+end
+Value_to_Standard_Normals_2 = [Variable_2 combination1(:,2) Z_1];
+
+Z = [Z_1(:,1) Z_2(:,1)];
+
+% Calculate correlation north-east
+Semi_Samples_Z = Z(Z(:,1) > 0 & Z(:,2) > 0,:);
+correlation_NE = corr(Semi_Samples_Z(:,1),Semi_Samples_Z(:,2),'type','Pearson');
+
+% Calculate correlation south-west
+Semi_Samples_Z = Z(Z(:,1) < 0 & Z(:,2) < 0,:);
+correlation_SW = corr(Semi_Samples_Z(:,1),Semi_Samples_Z(:,2),'type','Pearson');
+
+% Calculate correlation north-west
+Semi_Samples_Z = Z(Z(:,1)<0 & Z(:,2)>0,:);
+correlation_NW = corr(Semi_Samples_Z(:,1),Semi_Samples_Z(:,2),'type','Pearson');
+
+% Calculate correlation south-east
+Semi_Samples_Z = Z(Z(:,1)>0 & Z(:,2)<0,:);
+correlation_SE = corr(Semi_Samples_Z(:,1),Semi_Samples_Z(:,2),'type','Pearson');
+
+correlation_Overall = corr(Z(:,1),Z(:,2),'type', 'Pearson');
+correlation_results(Arcnr,:) = [correlation_Overall correlation_NE correlation_SW correlation_NW correlation_SE];
+
+correlation_Original{Arcnr,1} = corr(data(:,Copulas(Arcnr,1)),data(:,Copulas(Arcnr,2)),'type', 'Spearman');
+correlation_Standard_Normal{Arcnr,1} = corr(Z(:,1),Z(:,2),'type', 'Pearson');
+Rankcorr_Standard_Normal(Arcnr,1) = 6*asin((correlation_Standard_Normal{Arcnr,1})/2)/pi;
+Check{Arcnr,:} = [datatext{1,Copulas(Arcnr,1)} datatext{1,Copulas(Arcnr,2)}];
+Z_plot{Arcnr,:} = Z;
+
+% BLANKET TEST - CRAMER - von MISES
+
+% TO PSEUDO-OBSERVATIONS
+U1 = length(Variable_1)*combination1(:,2)/(length(Variable_1)+1);
+U2 = length(Variable_2)*combination2(:,2)/(length(Variable_2)+1);
+% EMPERICAL COPULA
+u = linspace(0,1,50);
+
+% METHOD1
+% ------------------------------------------------------------------------
+% Count number of values above the given u
+
+for Unr = 1:1:length(U1)                  % Bivariate cumulative distribution of the pseudo-observations
+    for unr1 = 1:1:length(u)
+    U_1 = U1(Unr,:);
+    u_1 = u(1,unr1);
+    logicals_u1 = le(U_1,u_1);
+        for unr2 = 1:1:length(u)
+        U_2 = U2(Unr,:);
+        u_2 = u(1,unr2);
+        logicals_u2 = le(U_2,u_2);
+        per_observation(unr1,unr2,Unr) = transpose(logicals_u1).*logicals_u2;
+        end
+    end
+end
+
+Empirical_Copula{Arcnr}= sum(per_observation,3)/length(U1);
+
+   
+% PARAMETRIC COPULAE
+[u1,u2] = meshgrid(u,u);
+
+% Gumbel
+paramhat_Gumbel = copulafit('Gumbel', [U1 U2]);
+C_Gumbel = copulacdf('Gumbel',[u1(:),u2(:)],paramhat_Gumbel);
+Gumbel_Copula{Arcnr} = C_Gumbel;
+
+X_Gumbel = Empirical_Copula{Arcnr}(:) - Gumbel_Copula{Arcnr}(:);
+Squared_differences_Gumbel = X_Gumbel.^2;
+SSD_Gumbel = sum(Squared_differences_Gumbel);
+
+% Gaussian
+rhohat = copulafit('Gaussian', [U1 U2]);
+C_Gaussian = copulacdf('Gaussian',[u1(:), u2(:)],rhohat);
+Gaussian_Copula{Arcnr} = C_Gaussian;
+
+X_Gaussian = Gaussian_Copula{Arcnr}(:) - Empirical_Copula{Arcnr}(:);
+Squared_differences_Gaussian = X_Gaussian.^2;
+SSD_Gaussian = sum(Squared_differences_Gaussian);
+
+% Clayton
+paramhat_Clayton = copulafit('Clayton', [U1 U2]);
+C_Clayton = copulacdf('Clayton',[u1(:), u2(:)],paramhat_Clayton);
+Clayton_Copula{Arcnr} = C_Clayton;
+
+X_Clayton = Clayton_Copula{Arcnr}(:) - Empirical_Copula{Arcnr}(:);
+Squared_differences_Clayton = X_Clayton.^2;
+SSD_Clayton = sum(Squared_differences_Clayton);
+
+Blanket_Test(Arcnr,:) = [SSD_Gumbel SSD_Gaussian SSD_Clayton]; %#ok<*SAGROW>
+end
+
+Table = [correlation_results Blanket_Test];
+
+%-------------------------------------------------------------------------
+%           PLOTS
+% -------------------------------------------------------------------------
+Arcnr_to_plot = 27;
+TUblue = [0 166 214]./255;
+lightgrey = [214 214 214]./255;
+
+figure(1)
+subplot(2,2,1)
+scatter(Z_plot{7}(:,1), Z_plot{7}(:,2));
+title('D_A_R_C_;_1 & Discharge ARC (\rho = 0.92)')
+xlim([-3 3])
+ylim([-3 3])
+line([-3 3],[0 0], 'Color', 'r')
+line([0 0],[-3 3],'Color', 'r')
+xlabel('D_A_R_C_;_1')
+ylabel('Discharge ARC')
+grid on
+box on
+str_NE = ['\rho_N_E = ',num2str(round(correlation_results(7,2),2))];
+text(1.8,2.7,str_NE)
+str_SE = ['\rho_S_E = ',num2str(round(correlation_results(7,5),2))];
+text(1.8,-2.7,str_SE)
+str_NW = ['\rho_N_W = ',num2str(round(correlation_results(7,4),2))];
+text(-2.9,2.7,str_NW)
+str_SW = ['\rho_S_W = ',num2str(round(correlation_results(7,3),2))];
+text(-2.9,-2.7,str_SW)
+
+subplot(2,2,2)
+scatter(Z_plot{24}(:,1), Z_plot{24}(:,2));
+title('D_A_R_C_;_4 & D_A_R_C_;_5 (\rho = 0.72)')
+xlim([-3 3])
+ylim([-3 3])
+line([-3 3],[0 0], 'Color', 'r')
+line([0 0],[-3 3],'Color', 'r')
+xlabel('D_A_R_C_;_4')
+ylabel('D_A_R_C_;_5')
+grid on
+box on
+str_NE = ['\rho_N_E = ',num2str(round(correlation_results(24,2),2))];
+text(1.8,2.7,str_NE)
+str_SE = ['\rho_S_E = ',num2str(round(correlation_results(24,5),2))];
+text(1.8,-2.7,str_SE)
+str_NW = ['\rho_N_W = ',num2str(round(correlation_results(24,4),2))];
+text(-2.9,2.7,str_NW)
+str_SW = ['\rho_S_W = ',num2str(round(correlation_results(24,3),2))];
+text(-2.9,-2.7,str_SW)
+
+subplot(2,2,3)
+scatter(Z_plot{27}(:,1), Z_plot{27}(:,2));
+title('D_A_R_C_;_4 & Discharge ARC (\rho = 0.85)')
+xlim([-3 3])
+ylim([-3 3])
+line([-3 3],[0 0], 'Color', 'r')
+line([0 0],[-3 3],'Color', 'r')
+xlabel('D_A_R_C_;_4')
+ylabel('Discharge ARC')
+grid on
+box on
+str_NE = ['\rho_N_E = ',num2str(round(correlation_results(27,2),2))];
+text(1.8,2.7,str_NE)
+str_SE = ['\rho_S_E = ',num2str(round(correlation_results(27,5),2))];
+text(1.8,-2.7,str_SE)
+str_NW = ['\rho_N_W = ',num2str(round(correlation_results(27,4),2))];
+text(-2.9,2.7,str_NW)
+str_SW = ['\rho_S_W = ',num2str(round(correlation_results(27,3),2))];
+text(-2.9,-2.7,str_SW)
+
+subplot(2,2,4)
+scatter(Z_plot{30}(:,1), Z_plot{30}(:,2));
+title('D_A_R_C_;_5 & D_A_R_C_;_6 (\rho = 0.65)')
+xlim([-3 3])
+ylim([-3 3])
+line([-3 3],[0 0], 'Color', 'r')
+line([0 0],[-3 3],'Color', 'r')
+xlabel('D_A_R_C_;_5')
+ylabel('D_A_R_C_;_6')
+grid on
+%xlabel(datatext{1,(Copulas(Arcnr_to_plot,1))});
+%ylabel(datatext{1,(Copulas(Arcnr_to_plot,2))})
+box on
+str_NE = ['\rho_N_E = ',num2str(round(correlation_results(30,2),2))];
+text(1.8,2.7,str_NE)
+str_SE = ['\rho_S_E = ',num2str(round(correlation_results(30,5),2))];
+text(1.8,-2.7,str_SE)
+str_NW = ['\rho_N_W = ',num2str(round(correlation_results(30,4),2))];
+text(-2.9,2.7,str_NW)
+str_SW = ['\rho_S_W = ',num2str(round(correlation_results(30,3),2))];
+text(-2.9,-2.7,str_SW)
+
+figure(2)
+subplot(2,2,1)
+h = surf(u,u,Empirical_Copula{Arcnr_to_plot},'FaceAlpha',0.2);
+set(h,'edgecolor',TUblue,'facecolor',[lightgrey])
+title('Empirical Copula')
+zlabel('copulacdf(u,v)')
+subplot(2,2,2)
+h = surf(u,u,reshape(Gaussian_Copula{Arcnr_to_plot},sqrt(length(Gaussian_Copula{Arcnr_to_plot})),sqrt(length(Gaussian_Copula{Arcnr_to_plot}))),'FaceAlpha',0.2);
+set(h,'edgecolor',TUblue,'facecolor',[lightgrey])
+title('Gaussian Copula CDF, M(u) = 0.21')
+zlabel('copulacdf(u,v)')
+subplot(2,2,3)
+h = surf(u,u,reshape(Gumbel_Copula{Arcnr_to_plot},sqrt(length(Gumbel_Copula{Arcnr_to_plot})),sqrt(length(Gumbel_Copula{Arcnr_to_plot}))),'FaceAlpha',0.2);
+set(h,'edgecolor',TUblue,'facecolor',[lightgrey])
+title('Gumbel Copula CDF, M(u) = 0.17')
+zlabel('copulacdf(u,v)')
+subplot(2,2,4)
+h = surf(u,u,reshape(Clayton_Copula{Arcnr_to_plot},sqrt(length(Clayton_Copula{Arcnr_to_plot})),sqrt(length(Clayton_Copula{Arcnr_to_plot}))),'FaceAlpha',0.2);
+set(h,'edgecolor',TUblue,'facecolor',[lightgrey])
+title('Clayton Copula CDF, M(u) = 1.37')
+zlabel('copulacdf(u,v)')
+
+figure(3)
+surf(u,u,Empirical_Copula{Arcnr_to_plot},'FaceAlpha',0.2);
+hold on
+surf(u,u,reshape(Gumbel_Copula{Arcnr_to_plot},sqrt(length(Gumbel_Copula{Arcnr_to_plot})),sqrt(length(Gumbel_Copula{Arcnr_to_plot}))),'FaceAlpha',0.2)
