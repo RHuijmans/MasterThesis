@@ -1,0 +1,575 @@
+%% MainScript
+This script withdraws the fundamental results from the simulation files. 
+
+clear
+close all
+
+% SIMULATION INPUT
+end_of_time_series = 34;                                                    % Year 34 is equal to 2050
+Ns = 50000;                                                                 % Number of simulations per year                                                     
+
+%==========================================================================
+% LOAD OUTPUT BNs
+%==========================================================================
+% Import NPBN output for Scenario "Low"
+data_2017 = importdata('2017_Low.sae');
+data_2018 = importdata('2018_Low.sae');              
+data_2019 = importdata('2019_Low.sae');
+data_2020 = importdata('2020_Low.sae');
+data_2021 = importdata('2021_Low.sae');
+data_2022 = importdata('2022_Low.sae');
+data_2023 = importdata('2023_Low.sae');
+data_2024 = importdata('2024_Low.sae');
+data_2025 = importdata('2025_Low.sae');
+data_2026 = importdata('2026_Low.sae');
+data_2027 = importdata('2027_Low.sae');
+data_2028 = importdata('2028_Low.sae');
+data_2029 = importdata('2029_Low.sae');
+data_2030 = importdata('2030_Low.sae');
+data_2031 = importdata('2031_Low.sae');
+data_2032 = importdata('2032_Low.sae');
+data_2033 = importdata('2033_Low.sae');
+data_2034 = importdata('2034_Low.sae');
+data_2035 = importdata('2035_Low.sae');
+data_2036 = importdata('2036_Low.sae');
+data_2037 = importdata('2037_Low.sae');
+data_2038 = importdata('2038_Low.sae');
+data_2039 = importdata('2039_Low.sae');
+data_2040 = importdata('2040_Low.sae');
+data_2041 = importdata('2041_Low.sae');
+data_2042 = importdata('2042_Low.sae');
+data_2043 = importdata('2043_Low.sae');
+data_2044 = importdata('2044_Low.sae');
+data_2045 = importdata('2045_Low.sae');
+data_2046 = importdata('2046_Low.sae');
+data_2047 = importdata('2047_Low.sae');
+data_2048 = importdata('2048_Low.sae');
+data_2049 = importdata('2049_Low.sae');
+data_2050 = importdata('2050_Low.sae');
+
+Low_All_NPBN_Output = {data_2017(1).data data_2018(1).data data_2019(1).data data_2020(1).data data_2021(1).data data_2022(1).data data_2023(1).data data_2024(1).data data_2025(1).data data_2026(1).data data_2027(1).data data_2028(1).data data_2029(1).data data_2030(1).data data_2031(1).data data_2032(1).data data_2033(1).data data_2034(1).data data_2035(1).data data_2036(1).data data_2037(1).data data_2038(1).data data_2039(1).data data_2040(1).data data_2041(1).data data_2042(1).data data_2043(1).data data_2044(1).data data_2045(1).data data_2046(1).data data_2047(1).data data_2048(1).data data_2049(1).data data_2050(1).data};
+
+% Import NPBN output for Scenario "Medium"
+data_2017 = importdata('2017_Medium.sae');
+data_2018 = importdata('2018_Medium.sae');              
+data_2019 = importdata('2019_Medium.sae');
+data_2020 = importdata('2020_Medium.sae');
+data_2021 = importdata('2021_Medium.sae');
+data_2022 = importdata('2022_Medium.sae');
+data_2023 = importdata('2023_Medium.sae');
+data_2024 = importdata('2024_Medium.sae');
+data_2025 = importdata('2025_Medium.sae');
+data_2026 = importdata('2026_Medium.sae');
+data_2027 = importdata('2027_Medium.sae');
+data_2028 = importdata('2028_Medium.sae');
+data_2029 = importdata('2029_Medium.sae');
+data_2030 = importdata('2030_Medium.sae');
+data_2031 = importdata('2031_Medium.sae');
+data_2032 = importdata('2032_Medium.sae');
+data_2033 = importdata('2033_Medium.sae');
+data_2034 = importdata('2034_Medium.sae');
+data_2035 = importdata('2035_Medium.sae');
+data_2036 = importdata('2036_Medium.sae');
+data_2037 = importdata('2037_Medium.sae');
+data_2038 = importdata('2038_Medium.sae');
+data_2039 = importdata('2039_Medium.sae');
+data_2040 = importdata('2040_Medium.sae');
+data_2041 = importdata('2041_Medium.sae');
+data_2042 = importdata('2042_Medium.sae');
+data_2043 = importdata('2043_Medium.sae');
+data_2044 = importdata('2044_Medium.sae');
+data_2045 = importdata('2045_Medium.sae');
+data_2046 = importdata('2046_Medium.sae');
+data_2047 = importdata('2047_Medium.sae');
+data_2048 = importdata('2048_Medium.sae');
+data_2049 = importdata('2049_Medium.sae');
+data_2050 = importdata('2050_Medium.sae');
+
+Medium_All_NPBN_Output = {data_2017(1).data data_2018(1).data data_2019(1).data data_2020(1).data data_2021(1).data data_2022(1).data data_2023(1).data data_2024(1).data data_2025(1).data data_2026(1).data data_2027(1).data data_2028(1).data data_2029(1).data data_2030(1).data data_2031(1).data data_2032(1).data data_2033(1).data data_2034(1).data data_2035(1).data data_2036(1).data data_2037(1).data data_2038(1).data data_2039(1).data data_2040(1).data data_2041(1).data data_2042(1).data data_2043(1).data data_2044(1).data data_2045(1).data data_2046(1).data data_2047(1).data data_2048(1).data data_2049(1).data data_2050(1).data};
+
+% Import NPBN output for Scenario "High"
+data_2017 = importdata('2017_High.sae');
+data_2018 = importdata('2018_High.sae');              
+data_2019 = importdata('2019_High.sae');
+data_2020 = importdata('2020_High.sae');
+data_2021 = importdata('2021_High.sae');
+data_2022 = importdata('2022_High.sae');
+data_2023 = importdata('2023_High.sae');
+data_2024 = importdata('2024_High.sae');
+data_2025 = importdata('2025_High.sae');
+data_2026 = importdata('2026_High.sae');
+data_2027 = importdata('2027_High.sae');
+data_2028 = importdata('2028_High.sae');
+data_2029 = importdata('2029_High.sae');
+data_2030 = importdata('2030_High.sae');
+data_2031 = importdata('2031_High.sae');
+data_2032 = importdata('2032_High.sae');
+data_2033 = importdata('2033_High.sae');
+data_2034 = importdata('2034_High.sae');
+data_2035 = importdata('2035_High.sae');
+data_2036 = importdata('2036_High.sae');
+data_2037 = importdata('2037_High.sae');
+data_2038 = importdata('2038_High.sae');
+data_2039 = importdata('2039_High.sae');
+data_2040 = importdata('2040_High.sae');
+data_2041 = importdata('2041_High.sae');
+data_2042 = importdata('2042_High.sae');
+data_2043 = importdata('2043_High.sae');
+data_2044 = importdata('2044_High.sae');
+data_2045 = importdata('2045_High.sae');
+data_2046 = importdata('2046_High.sae');
+data_2047 = importdata('2047_High.sae');
+data_2048 = importdata('2048_High.sae');
+data_2049 = importdata('2049_High.sae');
+data_2050 = importdata('2050_High.sae');
+
+High_All_NPBN_Output = {data_2017(1).data data_2018(1).data data_2019(1).data data_2020(1).data data_2021(1).data data_2022(1).data data_2023(1).data data_2024(1).data data_2025(1).data data_2026(1).data data_2027(1).data data_2028(1).data data_2029(1).data data_2030(1).data data_2031(1).data data_2032(1).data data_2033(1).data data_2034(1).data data_2035(1).data data_2036(1).data data_2037(1).data data_2038(1).data data_2039(1).data data_2040(1).data data_2041(1).data data_2042(1).data data_2043(1).data data_2044(1).data data_2045(1).data data_2046(1).data data_2047(1).data data_2048(1).data data_2049(1).data data_2050(1).data};
+
+% Import NPBN output for Scenario "Unexpected Sea Level Rise"
+data_2017 = importdata('2017_SLR.sae');
+data_2018 = importdata('2018_SLR.sae');              
+data_2019 = importdata('2019_SLR.sae');
+data_2020 = importdata('2020_SLR.sae');
+data_2021 = importdata('2021_SLR.sae');
+data_2022 = importdata('2022_SLR.sae');
+data_2023 = importdata('2023_SLR.sae');
+data_2024 = importdata('2024_SLR.sae');
+data_2025 = importdata('2025_SLR.sae');
+data_2026 = importdata('2026_SLR.sae');
+data_2027 = importdata('2027_SLR.sae');
+data_2028 = importdata('2028_SLR.sae');
+data_2029 = importdata('2029_SLR.sae');
+data_2030 = importdata('2030_SLR.sae');
+data_2031 = importdata('2031_SLR.sae');
+data_2032 = importdata('2032_SLR.sae');
+data_2033 = importdata('2033_SLR.sae');
+data_2034 = importdata('2034_SLR.sae');
+data_2035 = importdata('2035_SLR.sae');
+data_2036 = importdata('2036_SLR.sae');
+data_2037 = importdata('2037_SLR.sae');
+data_2038 = importdata('2038_SLR.sae');
+data_2039 = importdata('2039_SLR.sae');
+data_2040 = importdata('2040_SLR.sae');
+data_2041 = importdata('2041_SLR.sae');
+data_2042 = importdata('2042_SLR.sae');
+data_2043 = importdata('2043_SLR.sae');
+data_2044 = importdata('2044_SLR.sae');
+data_2045 = importdata('2045_SLR.sae');
+data_2046 = importdata('2046_SLR.sae');
+data_2047 = importdata('2047_SLR.sae');
+data_2048 = importdata('2048_SLR.sae');
+data_2049 = importdata('2049_SLR.sae');
+data_2050 = importdata('2050_SLR.sae');
+
+SLR_All_NPBN_Output = {data_2017(1).data data_2018(1).data data_2019(1).data data_2020(1).data data_2021(1).data data_2022(1).data data_2023(1).data data_2024(1).data data_2025(1).data data_2026(1).data data_2027(1).data data_2028(1).data data_2029(1).data data_2030(1).data data_2031(1).data data_2032(1).data data_2033(1).data data_2034(1).data data_2035(1).data data_2036(1).data data_2037(1).data data_2038(1).data data_2039(1).data data_2040(1).data data_2041(1).data data_2042(1).data data_2043(1).data data_2044(1).data data_2045(1).data data_2046(1).data data_2047(1).data data_2048(1).data data_2049(1).data data_2050(1).data};
+
+%==========================================================================
+% INDEPENDENT - Low
+%==========================================================================
+
+% INPUT 
+MTTF_Nijhuis = mean(Low_All_NPBN_Output{1,1}(:,19));                        
+MTTF_Stork = mean(Low_All_NPBN_Output{1,1}(:,20));
+% Resistance
+[Unavailability_Nijhuis_Pump_per_year, Unavailability_Stork_Pump_per_year, Probability_of_Unavailability_Hoofdas,Probability_of_Unavailability_Hoofdasafdichting] = Fault_tree_Independence(MTTF_Nijhuis, MTTF_Stork, end_of_time_series);                    % Non-Availability of the pump at year t
+
+% SIMULATIONS
+[D_IJmuiden_year_dist, Pf_Failure_per_year,T_cap_pumps_year_dist] = Simulations_Low(Ns,Unavailability_Nijhuis_Pump_per_year, Unavailability_Stork_Pump_per_year, end_of_time_series,Low_All_NPBN_Output);
+
+% OUTPUT
+Independent_Low_Unavailability_Nijhuis_Pump_per_year = Unavailability_Nijhuis_Pump_per_year;
+Independent_Low_Unavailability_Stork_Pump_per_year = Unavailability_Stork_Pump_per_year;
+Independent_Low_D_IJmuiden_year_dist = D_IJmuiden_year_dist;
+Independent_Low_Pf_Failure_per_year= Pf_Failure_per_year;
+Independent_Low_Probability_of_Unavailability_Hoofdas = Probability_of_Unavailability_Hoofdas;
+Independent_Low_Probability_of_Unavailability_Hoofdasafd = Probability_of_Unavailability_Hoofdasafdichting;
+Independent_Low_Capacities = T_cap_pumps_year_dist;
+
+% ==========================================================================
+% INDEPENDENT - Medium
+%==========================================================================
+
+% INPUT 
+MTTF_Nijhuis = mean(Medium_All_NPBN_Output{1,1}(:,19));
+MTTF_Stork = mean(Medium_All_NPBN_Output{1,1}(:,20));
+% Resistance
+[Unavailability_Nijhuis_Pump_per_year, Unavailability_Stork_Pump_per_year, Probability_of_Unavailability_Hoofdas,Probability_of_Unavailability_Hoofdasafdichting] = Fault_tree_Independence(MTTF_Nijhuis, MTTF_Stork, end_of_time_series);                    % Non-Availability of the pump at year t
+
+% SIMULATIONS
+[D_IJmuiden_year_dist, Pf_Failure_per_year,T_cap_pumps_year_dist] = Simulations_Medium(Ns, Unavailability_Nijhuis_Pump_per_year, Unavailability_Stork_Pump_per_year, end_of_time_series,Medium_All_NPBN_Output);
+
+% OUTPUT
+Independent_Medium_Unavailability_Nijhuis_Pump_per_year = Unavailability_Nijhuis_Pump_per_year;
+Independent_Medium_Unavailability_Stork_Pump_per_year = Unavailability_Stork_Pump_per_year;
+Independent_Medium_D_IJmuiden_year_dist = D_IJmuiden_year_dist;
+Independent_Medium_Pf_Failure_per_year= Pf_Failure_per_year;
+Independent_Medium_Probability_of_Unavailability_Hoofdas = Probability_of_Unavailability_Hoofdas;
+Independent_Medium_Probability_of_Unavailability_Hoofdasafd = Probability_of_Unavailability_Hoofdasafdichting;
+Independent_Medium_Capacities = T_cap_pumps_year_dist;
+% ==========================================================================
+% INDEPENDENT - High
+%==========================================================================
+
+% INPUT 
+MTTF_Nijhuis = mean(High_All_NPBN_Output{1,1}(:,19));
+MTTF_Stork = mean(High_All_NPBN_Output{1,1}(:,20));
+% Resistance
+[Unavailability_Nijhuis_Pump_per_year, Unavailability_Stork_Pump_per_year, Probability_of_Unavailability_Hoofdas,Probability_of_Unavailability_Hoofdasafdichting] = Fault_tree_Independence(MTTF_Nijhuis, MTTF_Stork, end_of_time_series);                    % Non-Availability of the pump at year t
+
+% SIMULATIONS
+[D_IJmuiden_year_dist, Pf_Failure_per_year,T_cap_pumps_year_dist] = Simulations_High(Ns,Unavailability_Nijhuis_Pump_per_year, Unavailability_Stork_Pump_per_year, end_of_time_series,High_All_NPBN_Output);
+
+% OUTPUT
+Independent_High_Unavailability_Nijhuis_Pump_per_year = Unavailability_Nijhuis_Pump_per_year;
+Independent_High_Unavailability_Stork_Pump_per_year = Unavailability_Stork_Pump_per_year;
+Independent_High_D_IJmuiden_year_dist = D_IJmuiden_year_dist;
+Independent_High_Pf_Failure_per_year= Pf_Failure_per_year;
+Independent_High_Probability_of_Unavailability_Hoofdas = Probability_of_Unavailability_Hoofdas;
+Independent_High_Probability_of_Unavailability_Hoofdasafd = Probability_of_Unavailability_Hoofdasafdichting;
+Independent_High_Capacities = T_cap_pumps_year_dist;
+
+% ==========================================================================
+% INDEPENDENT - Unexpected Sea Level Rise
+%==========================================================================
+
+% INPUT 
+MTTF_Nijhuis = mean(SLR_All_NPBN_Output{1,1}(:,19));
+MTTF_Stork = mean(SLR_All_NPBN_Output{1,1}(:,20));
+% Resistance
+[Unavailability_Nijhuis_Pump_per_year, Unavailability_Stork_Pump_per_year, Probability_of_Unavailability_Hoofdas,Probability_of_Unavailability_Hoofdasafdichting] = Fault_tree_Independence(MTTF_Nijhuis, MTTF_Stork, end_of_time_series);                    % Non-Availability of the pump at year t
+
+% SIMULATIONS
+[D_IJmuiden_year_dist, Pf_Failure_per_year,T_cap_pumps_year_dist] = Simulations_High(Ns,Unavailability_Nijhuis_Pump_per_year, Unavailability_Stork_Pump_per_year, end_of_time_series,SLR_All_NPBN_Output);
+
+% OUTPUT
+Independent_SLR_Unavailability_Nijhuis_Pump_per_year = Unavailability_Nijhuis_Pump_per_year;
+Independent_SLR_Unavailability_Stork_Pump_per_year = Unavailability_Stork_Pump_per_year;
+Independent_SLR_D_IJmuiden_year_dist = D_IJmuiden_year_dist;
+Independent_SLR_Pf_Failure_per_year= Pf_Failure_per_year;
+Independent_SLR_Probability_of_Unavailability_Hoofdas = Probability_of_Unavailability_Hoofdas;
+Independent_SLR_Probability_of_Unavailability_Hoofdasafd = Probability_of_Unavailability_Hoofdasafdichting;
+Independent_SLR_Capacities = T_cap_pumps_year_dist;
+
+
+%==========================================================================
+% DEPENDENT - Low 
+%==========================================================================
+
+% INPUT 
+% Resistance
+[Unavailability_Nijhuis_Pump_per_year, Unavailability_Stork_Pump_per_year,MTTF_component,Probability_of_Unavailability_Hoofdas,Probability_of_Unavailability_Hoofdasafdichting] = Fault_tree_Dependence_Low(end_of_time_series,Low_All_NPBN_Output) ;
+
+% SIMULATIONS
+[D_IJmuiden_year_dist, Pf_Failure_per_year,T_cap_pumps_year_dist] = Simulations_Low(Ns, Unavailability_Nijhuis_Pump_per_year, Unavailability_Stork_Pump_per_year, end_of_time_series,Low_All_NPBN_Output);
+
+% OUTPUT
+Dependent_Low_Unavailability_Nijhuis_Pump_per_year = Unavailability_Nijhuis_Pump_per_year;
+Dependent_Low_Unavailability_Stork_Pump_per_year = Unavailability_Stork_Pump_per_year;
+Dependent_Low_D_IJmuiden_year_dist = D_IJmuiden_year_dist;
+Dependent_Low_Pf_Failure_per_year= Pf_Failure_per_year;
+Dependent_Low_Probability_of_Unavailability_Hoofdas = Probability_of_Unavailability_Hoofdas;
+Dependent_Low_Probability_of_Unavailability_Hoofdasafd = Probability_of_Unavailability_Hoofdasafdichting;
+Dependent_Low_MTTF = MTTF_component;
+Dependent_Low_Capacities = T_cap_pumps_year_dist;
+%==========================================================================
+% DEPENDENT - Medium 
+%==========================================================================
+
+% INPUT 
+% Resistance
+[Unavailability_Nijhuis_Pump_per_year, Unavailability_Stork_Pump_per_year,MTTF_component,Probability_of_Unavailability_Hoofdas,Probability_of_Unavailability_Hoofdasafdichting] = Fault_tree_Dependence_Medium(end_of_time_series,Medium_All_NPBN_Output) ;
+
+% SIMULATIONS
+[D_IJmuiden_year_dist, Pf_Failure_per_year,T_cap_pumps_year_dist] = Simulations_Medium(Ns, Unavailability_Nijhuis_Pump_per_year, Unavailability_Stork_Pump_per_year, end_of_time_series,Medium_All_NPBN_Output);
+
+% OUTPUT
+Dependent_Medium_Unavailability_Nijhuis_Pump_per_year = Unavailability_Nijhuis_Pump_per_year;
+Dependent_Medium_Unavailability_Stork_Pump_per_year = Unavailability_Stork_Pump_per_year;
+Dependent_Medium_D_IJmuiden_year_dist = D_IJmuiden_year_dist;
+Dependent_Medium_Pf_Failure_per_year = Pf_Failure_per_year;
+Dependent_Medium_Probability_of_Unavailability_Hoofdas = Probability_of_Unavailability_Hoofdas;
+Dependent_Medium_Probability_of_Unavailability_Hoofdasafd = Probability_of_Unavailability_Hoofdasafdichting;
+Dependent_Medium_Capacities = T_cap_pumps_year_dist;
+%==========================================================================
+% DEPENDENT - High 
+%==========================================================================
+
+% INPUT 
+% Resistance
+[Unavailability_Nijhuis_Pump_per_year, Unavailability_Stork_Pump_per_year,MTTF_component,Probability_of_Unavailability_Hoofdas,Probability_of_Unavailability_Hoofdasafdichting] = Fault_tree_Dependence_High(end_of_time_series,High_All_NPBN_Output) ;
+
+% SIMULATIONS
+[D_IJmuiden_year_dist, Pf_Failure_per_year,T_cap_pumps_year_dist] = Simulations_High(Ns, Unavailability_Nijhuis_Pump_per_year, Unavailability_Stork_Pump_per_year, end_of_time_series,High_All_NPBN_Output);
+
+% OUTPUT
+Dependent_High_Unavailability_Nijhuis_Pump_per_year = Unavailability_Nijhuis_Pump_per_year;
+Dependent_High_Unavailability_Stork_Pump_per_year = Unavailability_Stork_Pump_per_year;
+Dependent_High_D_IJmuiden_year_dist = D_IJmuiden_year_dist;
+Dependent_High_Pf_Failure_per_year = Pf_Failure_per_year;
+Dependent_High_Probability_of_Unavailability_Hoofdas = Probability_of_Unavailability_Hoofdas;
+Dependent_High_Probability_of_Unavailability_Hoofdasafd = Probability_of_Unavailability_Hoofdasafdichting;
+Dependent_High_Capacities = T_cap_pumps_year_dist;
+
+%==========================================================================
+% DEPENDENT - Unexpected Sea Level Rise 
+%==========================================================================
+
+% INPUT 
+% Resistance
+[Unavailability_Nijhuis_Pump_per_year, Unavailability_Stork_Pump_per_year,MTTF_component,Probability_of_Unavailability_Hoofdas,Probability_of_Unavailability_Hoofdasafdichting] = Fault_tree_Dependence_High(end_of_time_series,SLR_All_NPBN_Output) ;
+
+% SIMULATIONS
+[D_IJmuiden_year_dist, Pf_Failure_per_year,T_cap_pumps_year_dist] = Simulations_High(Ns, Unavailability_Nijhuis_Pump_per_year, Unavailability_Stork_Pump_per_year, end_of_time_series,SLR_All_NPBN_Output);
+
+% OUTPUT
+Dependent_SLR_Unavailability_Nijhuis_Pump_per_year = Unavailability_Nijhuis_Pump_per_year;
+Dependent_SLR_Unavailability_Stork_Pump_per_year = Unavailability_Stork_Pump_per_year;
+Dependent_SLR_D_IJmuiden_year_dist = D_IJmuiden_year_dist;
+Dependent_SLR_Pf_Failure_per_year = Pf_Failure_per_year;
+Dependent_SLR_Probability_of_Unavailability_Hoofdas = Probability_of_Unavailability_Hoofdas;
+Dependent_SLR_Probability_of_Unavailability_Hoofdasafd = Probability_of_Unavailability_Hoofdasafdichting;
+Dependent_SLR_Capacities = T_cap_pumps_year_dist;
+
+
+%==========================================================================
+%       PLOTS
+%==========================================================================
+%%
+TUblue = [0 166 214]./255;                                                  % Color TUDelft
+lightgrey = [214 214 214]./255;
+darkgrey = [100 100 100]./255;
+% ======================================================
+% Solicitation 
+% ------------------------------------------------------
+figure (1)                                                                  % Discharges in time
+h1 = cdfplot(Dependent_Medium_D_IJmuiden_year_dist{1,1});
+hold on
+h2 = cdfplot(Dependent_Medium_D_IJmuiden_year_dist{1,14});
+hold on 
+h3 = cdfplot(Dependent_Medium_D_IJmuiden_year_dist{1,34});
+hold off
+set(h1,'Color','black')
+set(h2,'Color','r')
+set(h3,'Color',TUblue)
+xlabel('Discharge [m^3/s]')
+ylabel('Probability')
+title('Discharges IJmuiden')
+legend('2017', '2030', '2050', 'Location', 'best')
+
+% ================================================================
+% Resistance
+% ----------------------------------------------------------------
+x = 2017:1:2050;
+
+figure (2)                                                                  % Total pump station capacity
+h2 = cdfplot(Independent_Medium_Capacities{1,1});
+hold on
+cdfplot(Dependent_Medium_Capacities{1,1});
+hold on
+h4 = cdfplot(Independent_Medium_Capacities{1,14});
+hold on
+h3 = cdfplot(Dependent_Medium_Capacities{1,14});
+hold on
+h6 = cdfplot(Independent_Medium_Capacities{1,34});
+hold on
+h5 = cdfplot(Dependent_Medium_Capacities{1,34});
+hold off
+set(h4,'LineStyle', '--','Color','r')
+set(h2,'LineStyle', '--')
+set(h6,'LineStyle', '--','Color',TUblue)
+set(h3,'Color','r')
+set(h5,'Color',TUblue)
+ylim([0 1])
+xlim([150 max([Dependent_Medium_Capacities{1,34}])])
+xlabel('Discharge [m^3/s]')
+ylabel('Probability')
+title('Total pump capacity: Dependent vs. Independent')
+legend('2017 - Dependent', '2017 - Independent', '2030 - Dependent','2030 - Independent', '2050 - Dependent', '2050 - Independent',  'Location','best')
+
+%%
+figure (3)                                                                  % Time-to-Failure distrubutions
+subplot(1,2,1) 
+h1 = cdfplot(Medium_All_NPBN_Output{1,1}(:,20));
+hold on
+h2 = cdfplot(Medium_All_NPBN_Output{1,14}(:,20));
+hold on
+h3 = cdfplot(Medium_All_NPBN_Output{1,34}(:,20));
+hold on
+line([30 55],[0.5 0.5])
+text(30.2,0.53,'MTTF')
+hold off
+ylim([0 1])
+xlim([30 55])
+set(h1,'Color','black')
+set(h2,'Color','r')
+set(h3,'Color',TUblue)
+xlabel('Time to Failure [y]')
+ylabel('Probability')
+title('Failure distributions - Hoofdas Stork-pump')
+legend('2017', '2030', '2050','Location', 'best')
+
+subplot(1,2,2) 
+h1 = cdfplot(Medium_All_NPBN_Output{1,1}(:,19));
+hold on
+h2 = cdfplot(Medium_All_NPBN_Output{1,14}(:,19));
+hold on
+h3 = cdfplot(Medium_All_NPBN_Output{1,34}(:,19));
+hold on
+line([35 65],[0.5 0.5])
+text(35.2,0.53,'MTTF')
+hold off
+ylim([0 1])
+xlim([35 65])
+set(h1,'Color','black')
+set(h2,'Color','r')
+set(h3,'Color',TUblue)
+xlabel('Time to Failure [y]')
+ylabel('Probability')
+title('Failure distributions - Hoofdasafdichting Nijhuis-pump')
+legend('2017', '2030', '2050','Location', 'best')
+
+figure (4)                                                                  % Unavailability Pumps
+subplot(1,2,1)
+plot(x,Independent_Medium_Unavailability_Stork_Pump_per_year,'Color', 'black')
+hold on
+plot(x,Dependent_Medium_Unavailability_Stork_Pump_per_year, 'Color', TUblue)
+hold off
+xlim([2017 2050])
+ylim([0.052 0.057])
+xlabel('Year')
+ylabel('Probability of unavailability')
+title('Unavailability Stork pump: Dependent vs. Independent')
+legend('Independent','Dependent')
+
+subplot(1,2,2)
+plot(x,Independent_Medium_Unavailability_Nijhuis_Pump_per_year,'Color', 'black')
+hold on
+plot(x,Dependent_Medium_Unavailability_Nijhuis_Pump_per_year, 'Color', TUblue)
+hold off
+xlim([2017 2050])
+ylim([0.035 0.04])
+xlabel('Year')
+ylabel('Probability of unavailability')
+title('Unavailability Nijhuis pump: Dependent vs. Independent')
+legend('Independent','Dependent')
+
+figure (5)                                                                  % Probability of failure
+plot(x,Independent_Medium_Pf_Failure_per_year,'Color', 'black')
+hold on
+plot(x,Dependent_Medium_Pf_Failure_per_year,'Color', TUblue)
+hold off
+xlim([2017 2050])
+ylim([0.02 0.03])
+xlabel('Year')
+title('Probability of failure in time: Dependent vs. Independent')
+ylabel('Probability of Failure')
+legend('Independent','Dependent')
+
+figure (6)                                                                  % Probablity of failure per scenario
+plot(x,Dependent_Low_Pf_Failure_per_year,'Color', 'g')
+hold on
+plot(x,Independent_Low_Pf_Failure_per_year, 'LineStyle', '--', 'Color', 'g')
+hold on
+plot(x,Dependent_Medium_Pf_Failure_per_year, 'Color', TUblue)
+hold on
+plot(x,Independent_Medium_Pf_Failure_per_year, 'LineStyle', '--', 'Color', TUblue)
+hold on
+plot(x,Dependent_High_Pf_Failure_per_year, 'Color', 'black')
+hold on
+plot(x,Independent_High_Pf_Failure_per_year, 'LineStyle', '--', 'Color', 'black')
+hold off
+xlim([2017 2050])
+ylim([0.02 0.035])
+legend('Low - Dependent','Low - Independent','Medium - Dependent','Medium - Independent','High - Independent','High - Dependent', 'Location', 'best')
+xlabel('Year')
+ylabel('Probability of Failure')
+title('Probability of Pump station Failure per scenario: Dependent vs. Independent')
+
+figure (7)                                                                  % Comparing Unexpected SLR to current predictions
+subplot(1,2,1)
+plot(x,Dependent_SLR_Unavailability_Stork_Pump_per_year, 'Color', 'black')
+hold on
+plot(x,Independent_SLR_Unavailability_Stork_Pump_per_year, 'LineStyle', '--', 'Color', 'black')
+hold on
+plot(x,Dependent_Medium_Unavailability_Stork_Pump_per_year, 'Color', darkgrey)
+hold on
+plot(x,Independent_Medium_Unavailability_Stork_Pump_per_year, 'LineStyle', '--', 'Color', darkgrey)
+hold off
+xlim([2017 2050])
+ylim([0.052 0.057])
+legend('Dependent - Unexpected Sea Level Rise','Independent - Unexpected Sea Level Rise', 'Medium - Dependent','Medium - Independent', 'Location', 'best')
+xlabel('Year')
+ylabel('Probability of Failure')
+title('Unavailability Stork pump per year')
+
+subplot(1,2,2)
+plot(x,Dependent_SLR_Unavailability_Nijhuis_Pump_per_year, 'Color', 'black')
+hold on
+plot(x,Independent_SLR_Unavailability_Nijhuis_Pump_per_year, 'LineStyle', '--', 'Color', 'black')
+hold on
+plot(x,Dependent_Medium_Unavailability_Nijhuis_Pump_per_year, 'Color', darkgrey)
+hold on
+plot(x,Independent_Medium_Unavailability_Nijhuis_Pump_per_year, 'LineStyle', '--', 'Color', darkgrey)
+hold off
+xlim([2017 2050])
+ylim([0.035 0.04])
+legend('Dependent - Unexpected Sea Level Rise','Independent - Unexpected Sea Level Rise', 'Medium - Dependent','Medium - Independent', 'Location', 'best')
+xlabel('Year')
+ylabel('Probability of Failure')
+title('Unavailability Nijhuis pump per year')
+
+figure (8)                                                                  
+plot(x,Dependent_SLR_Pf_Failure_per_year, 'Color', 'black')
+hold on
+plot(x,Independent_SLR_Pf_Failure_per_year, 'LineStyle', '--', 'Color', 'black')
+hold on
+plot(x,Dependent_Medium_Pf_Failure_per_year, 'Color', darkgrey)
+hold on
+plot(x,Independent_Medium_Pf_Failure_per_year, 'LineStyle', '--', 'Color', darkgrey)
+hold off
+xlim([2017 2050])
+ylim([0.02 0.05])
+legend('Dependent - Unexpected Sea Level Rise','Independent - Unexpected Sea Level Rise', 'Medium - Dependent','Medium - Independent', 'Location', 'best')
+xlabel('Year')
+ylabel('Probability of Failure')
+title('Probability of Pump station Failure - Unexpected Sea Level Rise')
+
+figure (9)                                                                  % Dicharge capacities on Q-H curve
+subplot(1,3,1)
+scatter((SLR_All_NPBN_Output_new_Stork{1}(:,28)), (SLR_All_NPBN_Output_new_Stork{1}(:,29)),'.', 'MarkerEdgeColor', darkgrey)
+hold on
+scatter(SLR_All_NPBN_Output_new_Nijhuis{1}(:,27), SLR_All_NPBN_Output_new_Nijhuis{1}(:,29),'.', 'MarkerEdgeColor', TUblue)
+hold off
+ylim([0 4])
+xlim([25 60])
+grid('on')
+legend('Stork pump','Nijhuis pump')
+title('2017 - New Predictions')
+xlabel('Discharge volume m^3/s')
+ylabel('Water head (m)')
+
+subplot(1,3,2)
+scatter(SLR_All_NPBN_Output_new_Stork{14}(:,28), SLR_All_NPBN_Output_new_Stork{14}(:,29),'.', 'MarkerEdgeColor', darkgrey)
+hold on
+scatter(SLR_All_NPBN_Output_new_Nijhuis{14}(:,27), SLR_All_NPBN_Output_new_Nijhuis{14}(:,29),'.', 'MarkerEdgeColor', TUblue)
+hold off
+ylim([0 4])
+xlim([25 60])
+grid('on')
+legend('Stork pump','Nijhuis pump')
+title('2030 - New Predictions')
+xlabel('Discharge volume m^3/s')
+ylabel('Water head (m)')
+
+subplot(1,3,3)
+scatter(SLR_All_NPBN_Output_new_Stork{34}(:,28), SLR_All_NPBN_Output_new_Stork{34}(:,29),'.', 'MarkerEdgeColor', darkgrey)
+hold on
+scatter(SLR_All_NPBN_Output_new_Nijhuis{34}(:,27), SLR_All_NPBN_Output_new_Nijhuis{34}(:,29),'.', 'MarkerEdgeColor', TUblue)
+hold off
+ylim([0 4])
+xlim([25 60])
+grid('on')
+title('2050 - New Predictions')
+legend('Stork pump','Nijhuis pump')
+xlabel('Discharge volume m^3/s')
+ylabel('Water head (m)')
