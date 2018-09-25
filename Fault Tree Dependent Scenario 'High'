@@ -1,0 +1,54 @@
+function [Unavailability_Nijhuis_Pump_per_year, Unavailability_Stork_Pump_per_year,MTTF_component,Probability_of_Unavailability_Hoofdas,Probability_of_Unavailability_Hoofdasafdichting] = Fault_tree_Dependence_High(end_of_time_series,High_All_NPBN_Output)
+% Fault Tree
+% This script a simplification of Pumping Station Ijmuiden's  fault tree
+% Fault Tree
+% This script a simplification of Pumping Station Ijmuiden's  fault tree
+
+% INPUT
+data = importdata('FaultTreeSamples.csv');
+Samples_of_non_Availability_all_Components = data(1).data;
+%==========================================================================
+% STORK - PUMPS
+%==========================================================================
+% HOOFDAS
+for year = 1:1:end_of_time_series
+    Failure_Distribution_Component = High_All_NPBN_Output{:,year}(:,20);
+    MTTF_component(year,:) = mean(Failure_Distribution_Component);
+end 
+    MTTR = 1;
+    [Probability_of_Unavailability] = Markov_Chain_Dependent(MTTF_component,MTTR,end_of_time_series);
+    Probability_of_Unavailability_Hoofdas = Probability_of_Unavailability;
+
+% TOTAL SYSTEM
+Samples_of_Unavailability_Stork = Samples_of_non_Availability_all_Components(:,[2 4 6 8 10 12 15 17 19 21 23 25 27 29 31 33 35 37 39 41]);
+Probability_of_Unavailability_Stork = 1-(sum(Samples_of_Unavailability_Stork,1)/length(Samples_of_Unavailability_Stork));
+
+% CHECKS
+Probability_of_Unavailability_Stork = ones(length(Probability_of_Unavailability_Hoofdas),1).*Probability_of_Unavailability_Stork; 
+Probability_of_Unavailability_Stork(:,8) = Probability_of_Unavailability_Hoofdas;
+
+% INPUT HOOFDAS IN NPBN
+Unavailability_Stork_Pump_per_year = sum(Probability_of_Unavailability_Stork,2);
+
+%==========================================================================
+% Nijhuis - PUMPS
+%==========================================================================
+
+% HOOFDASLAGERING
+for year = 1:1:end_of_time_series
+    Failure_Distribution_Component = High_All_NPBN_Output{:,year}(:,19);
+    MTTF_component(year,:) = mean(Failure_Distribution_Component);
+end 
+    MTTR = 1;
+    [Probability_of_Unavailability] = Markov_Chain_Dependent(MTTF_component,MTTR,end_of_time_series);
+    Probability_of_Unavailability_Hoofdasafdichting = Probability_of_Unavailability;
+
+Samples_of_Unavailability_Nijhuis = Samples_of_non_Availability_all_Components(:,[1 3 5 7 9 11 13 14 16 18 20 22 24 26 28 30 32 34 36]);
+Probability_of_Unavailability_Nijhuis = 1-(sum(Samples_of_Unavailability_Nijhuis,1)/length(Samples_of_Unavailability_Nijhuis));
+
+% CHECKS
+Probability_of_Unavailability_Nijhuis = ones(length(Probability_of_Unavailability_Hoofdasafdichting),1).*Probability_of_Unavailability_Nijhuis; 
+Probability_of_Unavailability_Nijhuis(:,9) = Probability_of_Unavailability_Hoofdasafdichting;
+
+% INPUT HOOFDAS IN NPBN
+Unavailability_Nijhuis_Pump_per_year = sum(Probability_of_Unavailability_Nijhuis,2);
