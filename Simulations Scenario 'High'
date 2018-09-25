@@ -1,0 +1,74 @@
+function [D_IJmuiden_year_dist, Pf_Failure_per_year,T_cap_pumps_year_dist] = Simulations_High(Ns,Unavailability_Nijhuis_Pump_per_year, Unavailability_Stork_Pump_per_year, end_of_time_series, High_All_NPBN_Output)
+
+%==========================================================================
+% 1. SIMULATIONS
+%==========================================================================
+lambda = [53.75 59 67 72];   
+
+for year = 1:1:end_of_time_series 
+    High_All_NPBN_Output_n = High_All_NPBN_Output ;
+    if (year >= 1)  && (year <= 3)                                          % Year 2017 - 2019
+        param = lambda(:,1);
+        n_Nijhuis = 2;                                                      % Number of Nijhuis pumps
+        n_Stork = 4;                                                        % Number of Stork puump
+    elseif (year >= 4)  && (year <= 13)                                     % Year 2020 - 2029
+        param = lambda(:,2);
+        n_Nijhuis = 2;                                                      % Number of Nijhuis pumps
+        n_Stork = 4;                                                        % Number of Stork pumps
+    elseif (year >= 14) && (year <= 23)                                     % Year 2030 - 2039
+        param = lambda(:,3);
+        n_Nijhuis = 2;                                                              % Number of Nijhuis pumps
+        n_Stork = 4;                                                                % Number of Stork pumps
+    elseif (year >= 24) && (year <= 30)                                           % Year 2040 - 2050
+        param = lambda(:,4);
+        n_Nijhuis = 2;                                                              % Number of Nijhuis pumps
+        n_Stork = 4;                                                                % Number of Stork pumps
+    elseif (year >= 31)
+        param = lambda(:,4);
+        n_Nijhuis = 2;                                                              % Number of Nijhuis pumps
+        n_Stork = 4;                                                                % Number of Stork pumps
+    end
+
+% Solicitation
+Discharges_IJmuiden = High_All_NPBN_Output_n{year}(:,17);
+Discharge_Capacities_Nijhuis = High_All_NPBN_Output{year}(:,27);
+Discharge_Capacities_Stork = High_All_NPBN_Output{year}(:,28);
+% Resistance
+NA_Stork = Unavailability_Stork_Pump_per_year(year,1);                                                % Stork-pump are not available []  
+NA_Nijhuis = Unavailability_Nijhuis_Pump_per_year(year,1);                                              % Nijhuis-pump are not available []
+
+% 1.1. SUMULATIONS INDEPENDENT AND DEPENDENT CASE
+% 1.1.1 Simulations Discharges through system
+
+    for N_sim = 1:1:Ns
+        N_peaks_sim = poissrnd(param,1,1);
+        for N_peaks = 1:1:N_peaks_sim
+            i = randi([1 length(Discharges_IJmuiden)],1,1);
+            T_D1 = Discharges_IJmuiden(i,:);
+            D_IJmuiden{N_sim} (N_peaks,1)= T_D1; %#ok<*AGROW>
+            i = randi([1 length(Discharge_Capacities_Nijhuis)],1,1);
+            Discharge_Capacity_Nijhuis = Discharge_Capacities_Nijhuis(i,:);
+            Discharge_Capacities_Nijhuis_per_year(N_peaks,1)= Discharge_Capacity_Nijhuis; %#ok<*AGROW>
+            Discharge_Capacity_Stork = Discharge_Capacities_Stork(i,:);
+            Discharge_Capacities_Stork_per_year(N_peaks,1)= Discharge_Capacity_Stork; %#ok<*AGROW>
+        for p_Stork = 1:1:n_Stork                                            % Available or not?
+            rand_Cap_pump_Stork(N_peaks,p_Stork) = rand;
+            Cap_pump_Stork(N_peaks,p_Stork) = gt(rand_Cap_pump_Stork(N_peaks,p_Stork),NA_Stork);
+        end 
+        for p_Nijhuis = 1:1:n_Nijhuis
+            rand_Cap_pump_Nijhuis(N_peaks,p_Nijhuis) = rand;
+            Cap_pump_Nijhuis(N_peaks,p_Nijhuis) = gt(rand_Cap_pump_Nijhuis(N_peaks,p_Nijhuis),NA_Nijhuis);
+        end
+            T_cap_pumps{N_sim}(N_peaks,1) = sum([Cap_pump_Stork(N_peaks,:).*Discharge_Capacities_Stork_per_year(N_peaks,1) Cap_pump_Nijhuis(N_peaks,:).*Discharge_Capacities_Nijhuis_per_year(N_peaks,1)]);
+            Failure = gt(D_IJmuiden{N_sim}(N_peaks,1),T_cap_pumps{N_sim}(N_peaks,1));
+            Failure_MC{N_sim}(N_peaks,1) = Failure;
+        end 
+    end 
+Pf_System_year = vertcat(Failure_MC{:});  % Probability of System failure - Baseline
+D_IJmuiden_year = vertcat(D_IJmuiden{:});
+T_cap_pumps_year = vertcat(T_cap_pumps{:});
+
+Pf_Failure_per_year(year) = sum(Pf_System_year,1)/length(Pf_System_year);
+D_IJmuiden_year_dist{year}= D_IJmuiden_year;
+T_cap_pumps_year_dist{year} = T_cap_pumps_year;
+end 
